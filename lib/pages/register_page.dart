@@ -21,93 +21,107 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       appBar: AppBar(title: Text("Register Page"), centerTitle: true),
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Spacer(),
-                  Text(errorMessage, style: TextStyle(color: Colors.red)),
-                  SizedBox(height: 6.0),
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      hintText: "Your username",
-                      border: OutlineInputBorder(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12.0,
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? "Enter your username"
-                        : null,
-                  ),
-                  SizedBox(height: 12.0),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      hintText: "Your email",
-                      border: OutlineInputBorder(),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Spacer(),
+                          Text(
+                            errorMessage,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _usernameController,
+                            decoration: InputDecoration(
+                              hintText: "Your username",
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? "Enter your username"
+                                : null,
+                          ),
+                          SizedBox(height: 12.0),
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              hintText: "Your email",
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: validateEmail,
+                          ),
+                          SizedBox(height: 12.0),
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              hintText: "Your password",
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? "Enter your password"
+                                : null,
+                          ),
+                          SizedBox(height: 12.0),
+                          TextFormField(
+                            controller: _confirmPasswordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              hintText: "Confirm password",
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Confirm your password";
+                              }
+                              if (value != _passwordController.text) {
+                                return "Passwords do not match";
+                              }
+                              return null;
+                            },
+                          ),
+                          Spacer(),
+                          SizedBox(height: 12.0),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(double.maxFinite, 50),
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).secondaryHeaderColor,
+                            ),
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _usernameController.clear();
+                                _emailController.clear();
+                                _passwordController.clear();
+                                _confirmPasswordController.clear();
+                              }
+                            },
+                            child: Text("Register"),
+                          ),
+                        ],
+                      ),
                     ),
-                    validator: (value) => validateEmail(value),
                   ),
-                  SizedBox(height: 12.0),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: "Your password",
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? "Enter your password"
-                        : null,
-                  ),
-                  SizedBox(height: 12.0),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: "Confirm password",
-                      border: OutlineInputBorder(),
-                    ),
-
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Enter your password";
-                      }
-                      if (_passwordController.text !=
-                          _confirmPasswordController.text) {
-                        return "Passwords don't match";
-                      }
-                      return null;
-                    },
-                  ),
-                  Spacer(),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.maxFinite, 50),
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Theme.of(context).secondaryHeaderColor,
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _emailController.clear();
-                        _passwordController.clear();
-                        _confirmPasswordController.clear();
-                        _usernameController.clear();
-                      }
-                    },
-                    child: Text("Register"),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
