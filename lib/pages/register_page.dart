@@ -75,9 +75,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       hintText: "Confirm password",
                       border: OutlineInputBorder(),
                     ),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? "Enter your password"
-                        : null,
+
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Enter your password";
+                      }
+                      if (_passwordController.text !=
+                          _confirmPasswordController.text) {
+                        return "Passwords don't match";
+                      }
+                      return null;
+                    },
                   ),
                   Spacer(),
                   ElevatedButton(
