@@ -40,6 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Spacer(),
                           Text(
                             errorMessage,
+                            textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.red),
                           ),
                           SizedBox(height: 6.0),

@@ -31,7 +31,11 @@ class _SignInPageState extends State<SignInPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Spacer(),
-                  Text(errorMessage, style: TextStyle(color: Colors.red)),
+                  Text(
+                    errorMessage,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red),
+                  ),
                   SizedBox(height: 6.0),
                   TextFormField(
                     controller: _emailController,
