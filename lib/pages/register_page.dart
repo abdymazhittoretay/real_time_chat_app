@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_time_chat_app/helper_widgets.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -44,47 +45,38 @@ class _RegisterPageState extends State<RegisterPage> {
                             style: TextStyle(color: Colors.red),
                           ),
                           SizedBox(height: 6.0),
-                          TextFormField(
+                          myTextField(
                             controller: _usernameController,
-                            decoration: InputDecoration(
-                              hintText: "Your username",
-                              border: OutlineInputBorder(),
-                            ),
+                            hintText: "Your username",
                             validator: (value) =>
                                 (value == null || value.isEmpty)
                                 ? "Enter your username"
                                 : null,
                           ),
                           SizedBox(height: 12.0),
-                          TextFormField(
+                          myTextField(
                             controller: _emailController,
-                            decoration: InputDecoration(
-                              hintText: "Your email",
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: validateEmail,
+                            hintText: "Your email",
+                            validator: (value) =>
+                                (value == null || value.isEmpty)
+                                ? "Enter your email"
+                                : null,
+                            isEmail: true,
                           ),
                           SizedBox(height: 12.0),
-                          TextFormField(
+                          myTextField(
                             controller: _passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              hintText: "Your password",
-                              border: OutlineInputBorder(),
-                            ),
+                            hintText: "Your password",
                             validator: (value) =>
                                 (value == null || value.isEmpty)
                                 ? "Enter your password"
                                 : null,
+                            obscureText: true,
                           ),
                           SizedBox(height: 12.0),
-                          TextFormField(
+                          myTextField(
                             controller: _confirmPasswordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              hintText: "Confirm password",
-                              border: OutlineInputBorder(),
-                            ),
+                            hintText: "Confirm password",
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Confirm your password";
@@ -94,6 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               }
                               return null;
                             },
+                            obscureText: true,
                           ),
                           Spacer(),
                           SizedBox(height: 12.0),
@@ -126,23 +119,6 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
-  }
-
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Enter your email";
-    }
-    const pattern =
-        r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
-        r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
-        r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
-        r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
-        r'[0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9]'
-        r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
-        r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
-    final regex = RegExp(pattern);
-
-    return regex.hasMatch(value) ? null : "Enter a valid email address";
   }
 
   @override
