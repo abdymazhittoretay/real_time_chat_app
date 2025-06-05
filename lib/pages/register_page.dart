@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_time_chat_app/helper_widgets.dart';
+import 'package:real_time_chat_app/widgets/my_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -45,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             style: TextStyle(color: Colors.red),
                           ),
                           SizedBox(height: 6.0),
-                          myTextField(
+                          MyTextField(
                             controller: _usernameController,
                             hintText: "Your username",
                             validator: (value) =>
@@ -54,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 : null,
                           ),
                           SizedBox(height: 12.0),
-                          myTextField(
+                          MyTextField(
                             controller: _emailController,
                             hintText: "Your email",
                             validator: (value) =>
@@ -64,7 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             isEmail: true,
                           ),
                           SizedBox(height: 12.0),
-                          myTextField(
+                          MyTextField(
                             controller: _passwordController,
                             hintText: "Your password",
                             validator: (value) =>
@@ -74,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             obscureText: true,
                           ),
                           SizedBox(height: 12.0),
-                          myTextField(
+                          MyTextField(
                             controller: _confirmPasswordController,
                             hintText: "Confirm password",
                             validator: (value) {

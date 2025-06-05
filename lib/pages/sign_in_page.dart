@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_time_chat_app/helper_widgets.dart';
+import 'package:real_time_chat_app/widgets/my_text_field.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -38,7 +38,7 @@ class _SignInPageState extends State<SignInPage> {
                     style: TextStyle(color: Colors.red),
                   ),
                   SizedBox(height: 6.0),
-                  myTextField(
+                  MyTextField(
                     controller: _emailController,
                     hintText: "Your email",
                     validator: (value) => (value == null || value.isEmpty)
@@ -47,7 +47,7 @@ class _SignInPageState extends State<SignInPage> {
                     isEmail: true,
                   ),
                   SizedBox(height: 12.0),
-                  myTextField(
+                  MyTextField(
                     controller: _passwordController,
                     hintText: "Your password",
                     validator: (value) => (value == null || value.isEmpty)
