@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_time_chat_app/services/auth_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,7 +10,12 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Home Page"),
         centerTitle: true,
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.exit_to_app)),
+        leading: IconButton(
+          onPressed: () async {
+            await authService.value.signOut();
+          },
+          icon: Icon(Icons.exit_to_app),
+        ),
       ),
     );
   }
