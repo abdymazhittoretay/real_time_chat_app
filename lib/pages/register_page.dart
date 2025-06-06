@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:real_time_chat_app/services/auth_service.dart';
 import 'package:real_time_chat_app/widgets/my_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -98,8 +100,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                 context,
                               ).secondaryHeaderColor,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
+                                await register(
+                                  username: _usernameController.text,
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                );
                                 _usernameController.clear();
                                 _emailController.clear();
                                 _passwordController.clear();
@@ -119,6 +126,24 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  Future<void> register({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await authService.value.registerUserWithEmailAndPassword(
+        email: email,
+        password: password,
+        username: username,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message as String;
+      });
+    }
   }
 
   @override
