@@ -139,6 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
         password: password,
         username: username,
       );
+      if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message as String;
