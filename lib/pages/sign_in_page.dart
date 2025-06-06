@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:real_time_chat_app/services/auth_service.dart';
 import 'package:real_time_chat_app/widgets/my_text_field.dart';
 
 class SignInPage extends StatefulWidget {
@@ -60,8 +62,12 @@ class _SignInPageState extends State<SignInPage> {
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.maxFinite, 50),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
+                        await signIn(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        );
                         _emailController.clear();
                         _passwordController.clear();
                       }
@@ -75,6 +81,20 @@ class _SignInPageState extends State<SignInPage> {
         ),
       ),
     );
+  }
+
+  Future<void> signIn({required String email, required String password}) async {
+    try {
+      await authService.value.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if(mounted) Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message as String;
+      });
+    }
   }
 
   @override
