@@ -70,10 +70,15 @@ class _RegisterPageState extends State<RegisterPage> {
                           MyTextField(
                             controller: _passwordController,
                             hintText: "Your password",
-                            validator: (value) =>
-                                (value == null || value.isEmpty)
-                                ? "Enter your password"
-                                : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Enter your password";
+                              }
+                              if (value != _confirmPasswordController.text) {
+                                return "Passwords do not match";
+                              }
+                              return null;
+                            },
                             obscureText: true,
                           ),
                           SizedBox(height: 12.0),
