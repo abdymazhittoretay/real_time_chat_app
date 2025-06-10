@@ -5,15 +5,7 @@ class LoadingDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Row(
-        children: const [
-          CircularProgressIndicator(),
-          SizedBox(width: 16.0),
-          Text("Loading..."),
-        ],
-      ),
-    );
+    return Center(child: CircularProgressIndicator());
   }
 }
 
