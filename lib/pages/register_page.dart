@@ -109,10 +109,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   email: _emailController.text,
                                   password: _passwordController.text,
                                 );
-                                _usernameController.clear();
-                                _emailController.clear();
-                                _passwordController.clear();
-                                _confirmPasswordController.clear();
                               }
                             },
                             child: Text("Register"),
@@ -144,6 +140,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (mounted) Navigator.pop(context);
       if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      await Future.delayed(Durations.long4);
       setState(() {
         errorMessage = e.message as String;
       });

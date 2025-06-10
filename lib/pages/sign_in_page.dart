@@ -70,8 +70,6 @@ class _SignInPageState extends State<SignInPage> {
                           email: _emailController.text,
                           password: _passwordController.text,
                         );
-                        _emailController.clear();
-                        _passwordController.clear();
                       }
                     },
                     child: Text("Sign In"),
@@ -94,6 +92,7 @@ class _SignInPageState extends State<SignInPage> {
       if (mounted) Navigator.pop(context);
       if (mounted) Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      await Future.delayed(Durations.long4);
       setState(() {
         errorMessage = e.message as String;
       });
