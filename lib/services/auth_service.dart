@@ -17,30 +17,29 @@ class AuthService {
     required String password,
     required String username,
   }) async {
-    _firestoreInstance.collection("users").doc(currentUser!.uid).set({
-      "uid": currentUser!.uid,
-      "email": email,
-    });
     await _instance.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-
     await currentUser!.updateDisplayName(username);
+    _firestoreInstance.collection("users").doc(currentUser!.uid).set({
+      "uid": currentUser!.uid,
+      "email": email,
+    });
   }
 
   Future<void> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
-    _firestoreInstance.collection("users").doc(currentUser!.uid).set({
-      "uid": currentUser!.uid,
-      "email": email,
-    });
     await _instance.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+    _firestoreInstance.collection("users").doc(currentUser!.uid).set({
+      "uid": currentUser!.uid,
+      "email": email,
+    });
   }
 
   Future<void> changeUsername({required String username}) async {
