@@ -46,4 +46,23 @@ class FirestoreService {
         .collection("messages")
         .add(messageModel.toMap());
   }
+
+  Stream<List<Map<String, dynamic>>> getMessages({
+    required String senderID,
+    required String receiverID,
+  }) {
+    final List<String> ids = [receiverID, senderID];
+    ids.sort();
+    return _instance
+        .collection("chat_rooms")
+        .doc(ids.join("_"))
+        .collection("messages")
+        .orderBy('timestamp', descending: false)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return doc.data();
+          }).toList();
+        });
+  }
 }
