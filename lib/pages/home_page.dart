@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_time_chat_app/pages/chat_page.dart';
 import 'package:real_time_chat_app/services/auth_service.dart';
 import 'package:real_time_chat_app/services/firestore_service.dart';
 
@@ -39,7 +40,20 @@ class HomePage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final Map<String, dynamic> user = users[index];
                 if (user["email"] != authService.value.currentUser!.email) {
-                  return ListTile(title: Text(user["email"]));
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            receiverEmail: user["email"],
+                            receiverID: user["uid"],
+                          ),
+                        ),
+                      );
+                    },
+                    child: ListTile(title: Text(user["email"])),
+                  );
                 } else {
                   return const SizedBox.shrink();
                 }
