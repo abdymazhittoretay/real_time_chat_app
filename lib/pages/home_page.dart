@@ -52,7 +52,10 @@ class HomePage extends StatelessWidget {
                         ),
                       );
                     },
-                    child: ListTile(title: Text(user["email"])),
+                    child: ListTile(
+                      title: Text(user["email"]),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                    ),
                   );
                 } else {
                   return const SizedBox.shrink();
