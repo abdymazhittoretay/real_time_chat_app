@@ -37,6 +37,17 @@ class _ChatPageState extends State<ChatPage> {
                     receiverID: widget.receiverID,
                   ),
                   builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          "There are some error: ${snapshot.error}",
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       final List<Map<String, dynamic>> messages =
                           snapshot.data!;
@@ -109,7 +120,7 @@ class _ChatPageState extends State<ChatPage> {
                         },
                       );
                     } else {
-                      return SizedBox();
+                      return Center(child: Text("No messages yet."));
                     }
                   },
                 ),
