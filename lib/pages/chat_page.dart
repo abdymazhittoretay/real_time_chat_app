@@ -89,6 +89,10 @@ class _ChatPageState extends State<ChatPage> {
                           final isSentByMe =
                               message["senderID"] ==
                               authService.value.currentUser!.uid;
+
+                          final DateTime timestamp =
+                              (message["timestamp"] as Timestamp).toDate();
+
                           return Align(
                             alignment: isSentByMe
                                 ? Alignment.centerRight
@@ -96,6 +100,9 @@ class _ChatPageState extends State<ChatPage> {
                             child: Card(
                               color: Colors.white,
                               elevation: 5.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
@@ -103,15 +110,35 @@ class _ChatPageState extends State<ChatPage> {
                                       ? CrossAxisAlignment.end
                                       : CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.person),
-                                        Text(message["senderEmail"]),
-                                      ],
+                                    Text(
+                                      message["senderEmail"],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     SizedBox(height: 8.0),
-                                    Text(message["message"]),
+
+                                    /// 🔽 MAKE MESSAGE WRAPABLE
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                            0.7,
+                                      ),
+                                      child: Text(
+                                        message["message"],
+                                        softWrap: true,
+                                        overflow: TextOverflow.visible,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
