@@ -110,15 +110,15 @@ class _ChatPageState extends State<ChatPage> {
                                       ? CrossAxisAlignment.end
                                       : CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      message["senderEmail"],
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.abc),
+                                        SizedBox(width: 6.0),
+                                        Text(message["senderEmail"]),
+                                      ],
                                     ),
                                     SizedBox(height: 8.0),
-
-                                    /// 🔽 MAKE MESSAGE WRAPABLE
                                     ConstrainedBox(
                                       constraints: BoxConstraints(
                                         maxWidth:
@@ -131,12 +131,12 @@ class _ChatPageState extends State<ChatPage> {
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
-                                    SizedBox(height: 4),
+                                    SizedBox(height: 4.0),
                                     Text(
                                       "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
                                       style: TextStyle(
                                         fontSize: 10,
-                                        color: Colors.grey,
+                                        color: Colors.grey[700],
                                       ),
                                     ),
                                   ],
