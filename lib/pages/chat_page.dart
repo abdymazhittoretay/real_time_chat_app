@@ -163,4 +163,10 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
