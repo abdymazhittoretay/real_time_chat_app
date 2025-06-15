@@ -35,6 +35,10 @@ class HomePage extends StatelessWidget {
           }
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             final List<Map<String, dynamic>> users = snapshot.data!;
+            if (users.length == 1 &&
+                users[0]["uid"] == authService.value.currentUser!.uid) {
+              return Center(child: Text("No contacts yet."));
+            }
             return ListView.builder(
               itemCount: users.length,
               itemBuilder: (context, index) {
