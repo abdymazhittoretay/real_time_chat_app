@@ -97,51 +97,53 @@ class _ChatPageState extends State<ChatPage> {
                             alignment: isSentByMe
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
-                            child: Card(
-                              color: Colors.white,
-                              elevation: 5.0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: isSentByMe
-                                      ? CrossAxisAlignment.end
-                                      : CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(message["senderEmail"]),
+                                SizedBox(height: 4.0),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  color: Colors.white,
+                                  elevation: 5.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment: isSentByMe
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
                                       children: [
-                                        Icon(Icons.abc),
-                                        SizedBox(width: 6.0),
-                                        Text(message["senderEmail"]),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                0.7,
+                                          ),
+                                          child: Text(
+                                            message["message"],
+                                            softWrap: true,
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                          "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                    SizedBox(height: 8.0),
-                                    ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                            0.7,
-                                      ),
-                                      child: Text(
-                                        message["message"],
-                                        softWrap: true,
-                                        overflow: TextOverflow.visible,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4.0),
-                                    Text(
-                                      "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                SizedBox(height: 8.0),
+                              ],
                             ),
                           );
                         },
