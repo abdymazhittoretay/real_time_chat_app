@@ -104,45 +104,60 @@ class _ChatPageState extends State<ChatPage> {
                               children: [
                                 Text(message["senderEmail"]),
                                 SizedBox(height: 4.0),
-                                Card(
-                                  margin: EdgeInsets.zero,
-                                  color: Colors.white,
-                                  elevation: 5.0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment: isSentByMe
-                                          ? CrossAxisAlignment.end
-                                          : CrossAxisAlignment.start,
-                                      children: [
-                                        ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.7,
-                                          ),
-                                          child: Text(
-                                            message["message"],
-                                            softWrap: true,
-                                            overflow: TextOverflow.visible,
-                                          ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Card(
+                                      margin: EdgeInsets.zero,
+                                      color: Colors.white,
+                                      elevation: 5.0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment: isSentByMe
+                                              ? CrossAxisAlignment.end
+                                              : CrossAxisAlignment.start,
+                                          children: [
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.width *
+                                                    0.7,
+                                              ),
+                                              child: Text(
+                                                message["message"],
+                                                softWrap: true,
+                                                overflow: TextOverflow.visible,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4.0),
+                                            Text(
+                                              "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(height: 4.0),
-                                        Text(
-                                          "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                    IconButton(
+                                      onPressed: () {
+                                        firestoreService.value.deleteMessage(
+                                          receiverID: widget.receiverID,
+                                          receiverEmail: widget.receiverEmail,
+                                          docID: message["id"],
+                                        );
+                                      },
+                                      icon: Icon(Icons.delete),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 8.0),
                               ],
@@ -164,7 +179,8 @@ class _ChatPageState extends State<ChatPage> {
                       controller: _controller,
                       decoration: InputDecoration(
                         hintText: "Type your message here...",
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                   SizedBox(width: 10.0),
