@@ -14,7 +14,9 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getUsersList() {
     return _instance.collection("users").snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
-        return doc.data();
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
       }).toList();
     });
   }
@@ -47,6 +49,25 @@ class FirestoreService {
         .add(messageModel.toMap());
   }
 
+  Future<void> deleteMessage({
+    required String receiverID,
+    required String receiverEmail,
+    required String docID,
+  }) async {
+    final String senderID = _authInstance.currentUser!.uid;
+
+    final List<String> ids = [receiverID, senderID];
+
+    ids.sort();
+
+    await _instance
+        .collection("chat_rooms")
+        .doc(ids.join("_"))
+        .collection("messages")
+        .doc(docID)
+        .delete();
+  }
+
   Stream<List<Map<String, dynamic>>> getMessages({
     required String senderID,
     required String receiverID,
@@ -61,7 +82,9 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) {
           return snapshot.docs.map((doc) {
-            return doc.data();
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
           }).toList();
         });
   }
