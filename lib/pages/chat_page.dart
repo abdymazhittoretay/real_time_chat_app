@@ -162,7 +162,9 @@ class _ChatPageState extends State<ChatPage> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: InputDecoration(border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                        hintText: "Type your message here...",
+                        border: OutlineInputBorder()),
                     ),
                   ),
                   SizedBox(width: 10.0),
