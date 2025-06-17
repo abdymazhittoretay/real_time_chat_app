@@ -25,8 +25,6 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => scrollDown());
   }
 
   void scrollDown() {
@@ -68,6 +66,10 @@ class _ChatPageState extends State<ChatPage> {
 
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       final messages = snapshot.data!;
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) scrollDown();
+                      });
 
                       return GroupedListView<Map<String, dynamic>, DateTime>(
                         controller: _scrollController,
