@@ -20,6 +20,31 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollDown());
+  }
+
+  void scrollDown() {
+    if (!_scrollController.hasClients) return;
+
+    _scrollController.animateTo(
+      _scrollController.position.minScrollExtent,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +63,14 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          "There are some error: ${snapshot.error}",
-                          textAlign: TextAlign.center,
-                        ),
-                      );
+                      return Center(child: Text("Error: ${snapshot.error}"));
                     }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
+
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      final List<Map<String, dynamic>> messages =
-                          snapshot.data!;
+                      final messages = snapshot.data!;
+
                       return GroupedListView<Map<String, dynamic>, DateTime>(
+                        controller: _scrollController,
                         reverse: true,
                         order: GroupedListOrder.DESC,
                         useStickyGroupSeparators: true,
@@ -66,18 +85,18 @@ class _ChatPageState extends State<ChatPage> {
                             timestamp.day,
                           );
                         },
-                        groupHeaderBuilder: (Map<String, dynamic> message) {
-                          final DateTime timestamp =
-                              (message["timestamp"] as Timestamp).toDate();
+                        groupHeaderBuilder: (message) {
+                          final timestamp = (message["timestamp"] as Timestamp)
+                              .toDate();
                           return SizedBox(
-                            height: 50.0,
+                            height: 50,
                             child: Center(
                               child: Card(
                                 color: Colors.blue,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    "${timestamp.day.toString().padLeft(2, "0")} ${timestamp.month.toString().padLeft(2, "0")} ${timestamp.year}",
+                                    "${timestamp.day.toString().padLeft(2, '0')} ${timestamp.month.toString().padLeft(2, '0')} ${timestamp.year}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
@@ -85,13 +104,12 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                           );
                         },
-                        itemBuilder: (context, Map<String, dynamic> message) {
+                        itemBuilder: (context, message) {
                           final isSentByMe =
                               message["senderID"] ==
                               authService.value.currentUser!.uid;
-
-                          final DateTime timestamp =
-                              (message["timestamp"] as Timestamp).toDate();
+                          final timestamp = (message["timestamp"] as Timestamp)
+                              .toDate();
 
                           return Align(
                             alignment: isSentByMe
@@ -103,7 +121,7 @@ class _ChatPageState extends State<ChatPage> {
                                   : CrossAxisAlignment.start,
                               children: [
                                 Text(message["senderEmail"]),
-                                SizedBox(height: 4.0),
+                                const SizedBox(height: 4.0),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -135,9 +153,9 @@ class _ChatPageState extends State<ChatPage> {
                                                 overflow: TextOverflow.visible,
                                               ),
                                             ),
-                                            SizedBox(height: 4.0),
+                                            const SizedBox(height: 4.0),
                                             Text(
-                                              "${timestamp.hour.toString().padLeft(2, "0")}:${timestamp.minute.toString().padLeft(2, "0")}",
+                                              "${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}",
                                               style: TextStyle(
                                                 fontSize: 10,
                                                 color: Colors.grey[700],
@@ -155,35 +173,35 @@ class _ChatPageState extends State<ChatPage> {
                                           docID: message["id"],
                                         );
                                       },
-                                      icon: Icon(Icons.delete),
+                                      icon: const Icon(Icons.delete),
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                               ],
                             ),
                           );
                         },
                       );
-                    } else {
-                      return Center(child: Text("No messages yet."));
                     }
+
+                    return const Center(child: Text("No messages yet."));
                   },
                 ),
               ),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 12.0),
               Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: "Type your message here...",
                         border: OutlineInputBorder(),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10.0),
+                  const SizedBox(width: 10.0),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black,
@@ -198,10 +216,10 @@ class _ChatPageState extends State<ChatPage> {
                             message: _controller.text,
                           );
                           _controller.clear();
-                          FocusScope.of(context).unfocus();
+                          scrollDown();
                         }
                       },
-                      icon: Icon(Icons.send, color: Colors.white),
+                      icon: const Icon(Icons.send, color: Colors.white),
                     ),
                   ),
                 ],
@@ -211,11 +229,5 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
