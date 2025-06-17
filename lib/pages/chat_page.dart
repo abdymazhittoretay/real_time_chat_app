@@ -35,7 +35,7 @@ class _ChatPageState extends State<ChatPage> {
     _scrollController.animateTo(
       _scrollController.position.minScrollExtent,
       duration: Duration(milliseconds: 300),
-      curve: Curves.easeOut,
+      curve: Curves.fastOutSlowIn,
     );
   }
 
