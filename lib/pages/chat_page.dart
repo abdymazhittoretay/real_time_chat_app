@@ -22,9 +22,23 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  bool _showScrollDownButton = false;
+
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (!_scrollController.hasClients) return;
+
+      final threshold = 100.0;
+      final isNotAtBottom = _scrollController.offset > threshold;
+
+      if (isNotAtBottom != _showScrollDownButton) {
+        setState(() {
+          _showScrollDownButton = isNotAtBottom;
+        });
+      }
+    });
   }
 
   void scrollDown() {
@@ -67,123 +81,138 @@ class _ChatPageState extends State<ChatPage> {
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       final messages = snapshot.data!;
 
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) scrollDown();
-                      });
-
-                      return GroupedListView<Map<String, dynamic>, DateTime>(
-                        controller: _scrollController,
-                        reverse: true,
-                        order: GroupedListOrder.DESC,
-                        useStickyGroupSeparators: true,
-                        floatingHeader: true,
-                        elements: messages,
-                        groupBy: (message) {
-                          final timestamp = (message["timestamp"] as Timestamp)
-                              .toDate();
-                          return DateTime(
-                            timestamp.year,
-                            timestamp.month,
-                            timestamp.day,
-                          );
-                        },
-                        groupHeaderBuilder: (message) {
-                          final timestamp = (message["timestamp"] as Timestamp)
-                              .toDate();
-                          return SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: Card(
-                                color: Colors.blue,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "${timestamp.day.toString().padLeft(2, '0')} ${timestamp.month.toString().padLeft(2, '0')} ${timestamp.year}",
-                                    style: TextStyle(color: Colors.white),
+                      return Stack(
+                        children: [
+                          GroupedListView<Map<String, dynamic>, DateTime>(
+                            controller: _scrollController,
+                            reverse: true,
+                            order: GroupedListOrder.DESC,
+                            useStickyGroupSeparators: true,
+                            floatingHeader: true,
+                            elements: messages,
+                            groupBy: (message) {
+                              final timestamp =
+                                  (message["timestamp"] as Timestamp).toDate();
+                              return DateTime(
+                                timestamp.year,
+                                timestamp.month,
+                                timestamp.day,
+                              );
+                            },
+                            groupHeaderBuilder: (message) {
+                              final timestamp =
+                                  (message["timestamp"] as Timestamp).toDate();
+                              return SizedBox(
+                                height: 50,
+                                child: Center(
+                                  child: Card(
+                                    color: Colors.blue,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "${timestamp.day.toString().padLeft(2, '0')} ${timestamp.month.toString().padLeft(2, '0')} ${timestamp.year}",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                        itemBuilder: (context, message) {
-                          final isSentByMe =
-                              message["senderID"] ==
-                              authService.value.currentUser!.uid;
-                          final timestamp = (message["timestamp"] as Timestamp)
-                              .toDate();
+                              );
+                            },
+                            itemBuilder: (context, message) {
+                              final isSentByMe =
+                                  message["senderID"] ==
+                                  authService.value.currentUser!.uid;
+                              final timestamp =
+                                  (message["timestamp"] as Timestamp).toDate();
 
-                          return Align(
-                            alignment: isSentByMe
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Column(
-                              crossAxisAlignment: isSentByMe
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Text(message["senderEmail"]),
-                                const SizedBox(height: 4.0),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
+                              return Align(
+                                alignment: isSentByMe
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: isSentByMe
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
                                   children: [
-                                    Card(
-                                      margin: EdgeInsets.zero,
-                                      color: Colors.white,
-                                      elevation: 5.0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          crossAxisAlignment: isSentByMe
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
-                                          children: [
-                                            ConstrainedBox(
-                                              constraints: BoxConstraints(
-                                                maxWidth:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    0.7,
-                                              ),
-                                              child: Text(
-                                                message["message"],
-                                                softWrap: true,
-                                                overflow: TextOverflow.visible,
-                                              ),
+                                    Text(message["senderEmail"]),
+                                    const SizedBox(height: 4.0),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Card(
+                                          margin: EdgeInsets.zero,
+                                          color: Colors.white,
+                                          elevation: 5.0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
                                             ),
-                                            const SizedBox(height: 4.0),
-                                            Text(
-                                              "${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}",
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey[700],
-                                              ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Column(
+                                              crossAxisAlignment: isSentByMe
+                                                  ? CrossAxisAlignment.end
+                                                  : CrossAxisAlignment.start,
+                                              children: [
+                                                ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                    maxWidth:
+                                                        MediaQuery.of(
+                                                          context,
+                                                        ).size.width *
+                                                        0.7,
+                                                  ),
+                                                  child: Text(
+                                                    message["message"],
+                                                    softWrap: true,
+                                                    overflow:
+                                                        TextOverflow.visible,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4.0),
+                                                Text(
+                                                  "${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}",
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.grey[700],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                        IconButton(
+                                          onPressed: () {
+                                            firestoreService.value
+                                                .deleteMessage(
+                                                  receiverID: widget.receiverID,
+                                                  receiverEmail:
+                                                      widget.receiverEmail,
+                                                  docID: message["id"],
+                                                );
+                                          },
+                                          icon: const Icon(Icons.delete),
+                                        ),
+                                      ],
                                     ),
-                                    IconButton(
-                                      onPressed: () {
-                                        firestoreService.value.deleteMessage(
-                                          receiverID: widget.receiverID,
-                                          receiverEmail: widget.receiverEmail,
-                                          docID: message["id"],
-                                        );
-                                      },
-                                      icon: const Icon(Icons.delete),
-                                    ),
+                                    const SizedBox(height: 8.0),
                                   ],
                                 ),
-                                const SizedBox(height: 8.0),
-                              ],
+                              );
+                            },
+                          ),
+                          if (_showScrollDownButton)
+                            Positioned(
+                              left: 10,
+                              bottom: 10,
+                              child: FloatingActionButton(
+                                mini: true,
+                                onPressed: scrollDown,
+                                child: Icon(Icons.arrow_downward),
+                              ),
                             ),
-                          );
-                        },
+                        ],
                       );
                     }
 
