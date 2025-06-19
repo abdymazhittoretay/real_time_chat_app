@@ -24,7 +24,7 @@ class _ChatPageState extends State<ChatPage> {
 
   bool _showScrollDownButton = false;
 
-  Set<String> _hiddenMessages = {};
+  final Set<String> _hiddenMessages = {};
 
   @override
   void initState() {
