@@ -24,6 +24,8 @@ class _ChatPageState extends State<ChatPage> {
 
   bool _showScrollDownButton = false;
 
+  Set<String> _hiddenMessages = {};
+
   @override
   void initState() {
     super.initState();
@@ -89,7 +91,11 @@ class _ChatPageState extends State<ChatPage> {
                             order: GroupedListOrder.DESC,
                             useStickyGroupSeparators: true,
                             floatingHeader: true,
-                            elements: messages,
+                            elements: messages
+                                .where(
+                                  (m) => !_hiddenMessages.contains(m["id"]),
+                                )
+                                .toList(),
                             groupBy: (message) {
                               final timestamp =
                                   (message["timestamp"] as Timestamp).toDate();
@@ -157,6 +163,11 @@ class _ChatPageState extends State<ChatPage> {
                                               ),
                                               TextButton(
                                                 onPressed: () {
+                                                  setState(() {
+                                                    _hiddenMessages.add(
+                                                      message["id"],
+                                                    );
+                                                  });
                                                   Navigator.of(context).pop();
                                                 },
                                                 child: const Text(
