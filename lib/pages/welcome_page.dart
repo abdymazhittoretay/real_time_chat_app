@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:real_time_chat_app/pages/register_page.dart';
-import 'package:real_time_chat_app/pages/sign_in_page.dart';
+import 'package:real_time_chat_app/pages/register/register_page.dart';
+import 'package:real_time_chat_app/pages/sign_in/sign_in_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
