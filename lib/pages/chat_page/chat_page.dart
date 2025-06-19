@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:real_time_chat_app/services/auth_service.dart';
 import 'package:real_time_chat_app/services/firestore_service.dart';
-import 'package:real_time_chat_app/widgets/chat_input_field.dart';
-import 'package:real_time_chat_app/widgets/chat_message_bubble.dart';
+import 'package:real_time_chat_app/pages/chat_page/chat_input_field.dart';
+import 'package:real_time_chat_app/pages/chat_page/chat_message_bubble.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:real_time_chat_app/widgets/date_header.dart';
+import 'package:real_time_chat_app/pages/chat_page/date_header.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverEmail;

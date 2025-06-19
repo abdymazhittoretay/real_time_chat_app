@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:real_time_chat_app/pages/chat_page.dart';
+import 'package:real_time_chat_app/pages/chat_page/chat_page.dart';
 import 'package:real_time_chat_app/services/auth_service.dart';
 import 'package:real_time_chat_app/services/firestore_service.dart';
 
