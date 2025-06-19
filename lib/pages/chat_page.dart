@@ -136,10 +136,71 @@ class _ChatPageState extends State<ChatPage> {
                                   children: [
                                     Text(message["senderEmail"]),
                                     const SizedBox(height: 4.0),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Card(
+                                    GestureDetector(
+                                      onLongPress: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text('Delete Message'),
+                                            content: const Text(
+                                              'Are you sure you want to delete this message?',
+                                            ),
+                                            actionsOverflowDirection:
+                                                VerticalDirection.up,
+                                            actionsOverflowAlignment:
+                                                OverflowBarAlignment.center,
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text(
+                                                  'Delete for myself',
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                              isSentByMe
+                                                  ? TextButton(
+                                                      onPressed: () {
+                                                        firestoreService.value
+                                                            .deleteMessage(
+                                                              receiverID: widget
+                                                                  .receiverID,
+                                                              receiverEmail: widget
+                                                                  .receiverEmail,
+                                                              docID:
+                                                                  message["id"],
+                                                            );
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                      },
+                                                      child: const Text(
+                                                        'Delete for all',
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : SizedBox.shrink(),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 8.0,
+                                          right: 8.0,
+                                          bottom: 16.0,
+                                        ),
+                                        child: Card(
                                           margin: EdgeInsets.zero,
                                           color: Colors.white,
                                           elevation: 5.0,
@@ -182,21 +243,8 @@ class _ChatPageState extends State<ChatPage> {
                                             ),
                                           ),
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            firestoreService.value
-                                                .deleteMessage(
-                                                  receiverID: widget.receiverID,
-                                                  receiverEmail:
-                                                      widget.receiverEmail,
-                                                  docID: message["id"],
-                                                );
-                                          },
-                                          icon: const Icon(Icons.delete),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                    const SizedBox(height: 8.0),
                                   ],
                                 ),
                               );
