@@ -1,8 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:grouped_list/grouped_list.dart';
 import 'package:real_time_chat_app/services/auth_service.dart';
 import 'package:real_time_chat_app/services/firestore_service.dart';
+import 'package:real_time_chat_app/widgets/chat_input_field.dart';
+import 'package:real_time_chat_app/widgets/chat_message_bubble.dart';
+import 'package:grouped_list/grouped_list.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:real_time_chat_app/widgets/date_header.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverEmail;
@@ -21,9 +24,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
   bool _showScrollDownButton = false;
-
   final Set<String> _hiddenMessages = {};
 
   @override
@@ -31,26 +32,21 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     _scrollController.addListener(() {
       if (!_scrollController.hasClients) return;
-
-      final threshold = 100.0;
-      final isNotAtBottom = _scrollController.offset > threshold;
-
+      final isNotAtBottom = _scrollController.offset > 100;
       if (isNotAtBottom != _showScrollDownButton) {
-        setState(() {
-          _showScrollDownButton = isNotAtBottom;
-        });
+        setState(() => _showScrollDownButton = isNotAtBottom);
       }
     });
   }
 
   void scrollDown() {
-    if (!_scrollController.hasClients) return;
-
-    _scrollController.animateTo(
-      _scrollController.position.minScrollExtent,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.fastOutSlowIn,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.minScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.fastOutSlowIn,
+      );
+    }
   }
 
   @override
@@ -79,10 +75,10 @@ class _ChatPageState extends State<ChatPage> {
                     if (snapshot.hasError) {
                       return Center(child: Text("Error: ${snapshot.error}"));
                     }
-
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      final messages = snapshot.data!;
-
+                      final messages = snapshot.data!
+                          .where((m) => !_hiddenMessages.contains(m["id"]))
+                          .toList();
                       return Stack(
                         children: [
                           GroupedListView<Map<String, dynamic>, DateTime>(
@@ -91,175 +87,31 @@ class _ChatPageState extends State<ChatPage> {
                             order: GroupedListOrder.DESC,
                             useStickyGroupSeparators: true,
                             floatingHeader: true,
-                            elements: messages
-                                .where(
-                                  (m) => !_hiddenMessages.contains(m["id"]),
-                                )
-                                .toList(),
-                            groupBy: (message) {
-                              final timestamp =
-                                  (message["timestamp"] as Timestamp).toDate();
-                              return DateTime(
-                                timestamp.year,
-                                timestamp.month,
-                                timestamp.day,
-                              );
+                            elements: messages,
+                            groupBy: (msg) {
+                              final ts = (msg["timestamp"] as Timestamp)
+                                  .toDate();
+                              return DateTime(ts.year, ts.month, ts.day);
                             },
-                            groupHeaderBuilder: (message) {
-                              final timestamp =
-                                  (message["timestamp"] as Timestamp).toDate();
-                              return SizedBox(
-                                height: 50,
-                                child: Center(
-                                  child: Card(
-                                    color: Colors.blue,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        "${timestamp.day.toString().padLeft(2, '0')} ${timestamp.month.toString().padLeft(2, '0')} ${timestamp.year}",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            itemBuilder: (context, message) {
-                              final isSentByMe =
-                                  message["senderID"] ==
-                                  authService.value.currentUser!.uid;
-                              final timestamp =
-                                  (message["timestamp"] as Timestamp).toDate();
-
-                              return Align(
-                                alignment: isSentByMe
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: Column(
-                                  crossAxisAlignment: isSentByMe
-                                      ? CrossAxisAlignment.end
-                                      : CrossAxisAlignment.start,
-                                  children: [
-                                    Text(message["senderEmail"]),
-                                    const SizedBox(height: 4.0),
-                                    GestureDetector(
-                                      onLongPress: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            title: const Text('Delete Message'),
-                                            content: const Text(
-                                              'Are you sure you want to delete this message?',
-                                            ),
-                                            actionsOverflowDirection:
-                                                VerticalDirection.up,
-                                            actionsOverflowAlignment:
-                                                OverflowBarAlignment.center,
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _hiddenMessages.add(
-                                                      message["id"],
-                                                    );
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text(
-                                                  'Delete for myself',
-                                                  style: TextStyle(
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              ),
-                                              isSentByMe
-                                                  ? TextButton(
-                                                      onPressed: () {
-                                                        firestoreService.value
-                                                            .deleteMessage(
-                                                              receiverID: widget
-                                                                  .receiverID,
-                                                              receiverEmail: widget
-                                                                  .receiverEmail,
-                                                              docID:
-                                                                  message["id"],
-                                                            );
-                                                        Navigator.of(
-                                                          context,
-                                                        ).pop();
-                                                      },
-                                                      child: const Text(
-                                                        'Delete for all',
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : SizedBox.shrink(),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 8.0,
-                                          right: 8.0,
-                                          bottom: 16.0,
-                                        ),
-                                        child: Card(
-                                          margin: EdgeInsets.zero,
-                                          color: Colors.white,
-                                          elevation: 5.0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Column(
-                                              crossAxisAlignment: isSentByMe
-                                                  ? CrossAxisAlignment.end
-                                                  : CrossAxisAlignment.start,
-                                              children: [
-                                                ConstrainedBox(
-                                                  constraints: BoxConstraints(
-                                                    maxWidth:
-                                                        MediaQuery.of(
-                                                          context,
-                                                        ).size.width *
-                                                        0.7,
-                                                  ),
-                                                  child: Text(
-                                                    message["message"],
-                                                    softWrap: true,
-                                                    overflow:
-                                                        TextOverflow.visible,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4.0),
-                                                Text(
-                                                  "${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}",
-                                                  style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[700],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                            groupHeaderBuilder: (msg) => DateHeader(
+                              date: (msg["timestamp"] as Timestamp).toDate(),
+                            ),
+                            itemBuilder: (context, msg) => ChatMessageBubble(
+                              message: msg,
+                              isSentByMe:
+                                  msg["senderID"] ==
+                                  authService.value.currentUser!.uid,
+                              onDeleteForMe: () {
+                                setState(() => _hiddenMessages.add(msg["id"]));
+                              },
+                              onDeleteForAll: () {
+                                firestoreService.value.deleteMessage(
+                                  receiverID: widget.receiverID,
+                                  receiverEmail: widget.receiverEmail,
+                                  docID: msg["id"],
+                                );
+                              },
+                            ),
                           ),
                           if (_showScrollDownButton)
                             Positioned(
@@ -268,51 +120,30 @@ class _ChatPageState extends State<ChatPage> {
                               child: FloatingActionButton(
                                 mini: true,
                                 onPressed: scrollDown,
-                                child: Icon(Icons.arrow_downward),
+                                child: const Icon(Icons.arrow_downward),
                               ),
                             ),
                         ],
                       );
                     }
-
                     return const Center(child: Text("No messages yet."));
                   },
                 ),
               ),
               const SizedBox(height: 12.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: "Type your message here...",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10.0),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(24.0),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        if (_controller.text.isNotEmpty) {
-                          firestoreService.value.sendMessage(
-                            receiverID: widget.receiverID,
-                            receiverEmail: widget.receiverEmail,
-                            message: _controller.text,
-                          );
-                          _controller.clear();
-                          scrollDown();
-                        }
-                      },
-                      icon: const Icon(Icons.send, color: Colors.white),
-                    ),
-                  ),
-                ],
+              ChatInputField(
+                controller: _controller,
+                onSend: () {
+                  if (_controller.text.isNotEmpty) {
+                    firestoreService.value.sendMessage(
+                      receiverID: widget.receiverID,
+                      receiverEmail: widget.receiverEmail,
+                      message: _controller.text,
+                    );
+                    _controller.clear();
+                    scrollDown();
+                  }
+                },
               ),
             ],
           ),
