@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:real_time_chat_app/models/hidden_message.dart';
 import 'package:real_time_chat_app/models/message_model.dart';
 
 final ValueNotifier<FirestoreService> firestoreService = ValueNotifier(
@@ -47,6 +48,33 @@ class FirestoreService {
         .doc(ids.join("_"))
         .collection("messages")
         .add(messageModel.toMap());
+  }
+
+  Future<void> addHiddenMessage({
+    required String receiverID,
+    required String receiverEmail,
+    required String docID,
+  }) async {
+    final String senderID = _authInstance.currentUser!.uid;
+    final String senderEmail = _authInstance.currentUser!.email!;
+
+    final HiddenMessage hiddenMessage = HiddenMessage(
+      senderID: senderID,
+      senderEmail: senderEmail,
+      receiverID: receiverID,
+      receiverEmail: receiverEmail,
+      docID: docID,
+    );
+
+    final List<String> ids = [receiverID, senderID];
+
+    ids.sort();
+
+    await _instance
+        .collection("chat_rooms")
+        .doc(ids.join("_"))
+        .collection("hidden_messages")
+        .add(hiddenMessage.toMap());
   }
 
   Future<void> deleteMessage({
