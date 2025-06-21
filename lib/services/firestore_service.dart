@@ -64,6 +64,7 @@ class FirestoreService {
       receiverID: receiverID,
       receiverEmail: receiverEmail,
       docID: docID,
+      whoDeleted: senderID,
     );
 
     final List<String> ids = [receiverID, senderID];
@@ -102,18 +103,38 @@ class FirestoreService {
   }) {
     final List<String> ids = [receiverID, senderID];
     ids.sort();
-    return _instance
+    final chatRoomID = ids.join("_");
+
+    final messages = _instance
         .collection("chat_rooms")
-        .doc(ids.join("_"))
+        .doc(chatRoomID)
         .collection("messages")
-        .orderBy('timestamp', descending: false)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs.map((doc) {
+        .orderBy('timestamp', descending: false);
+
+    final hiddenMessages = _instance
+        .collection("chat_rooms")
+        .doc(chatRoomID)
+        .collection("hidden_messages")
+        .where('whoDeleted', isEqualTo: senderID);
+
+    return messages.snapshots().asyncMap((messageSnapshot) async {
+      final hiddenSnapshot = await hiddenMessages.get();
+      final hiddenIDs = hiddenSnapshot.docs
+          .map((doc) => doc.data()['docID'] as String)
+          .toSet();
+
+      final visibleMessages = messageSnapshot.docs
+          .where((doc) {
+            return !hiddenIDs.contains(doc.id);
+          })
+          .map((doc) {
             final data = doc.data();
-            data['id'] = doc.id;
+            data['docID'] = doc.id;
             return data;
-          }).toList();
-        });
+          })
+          .toList();
+
+      return visibleMessages;
+    });
   }
 }

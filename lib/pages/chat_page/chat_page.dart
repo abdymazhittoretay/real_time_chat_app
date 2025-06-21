@@ -25,7 +25,6 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _showScrollDownButton = false;
-  final Set<String> _hiddenMessages = {};
 
   @override
   void initState() {
@@ -76,9 +75,7 @@ class _ChatPageState extends State<ChatPage> {
                       return Center(child: Text("Error: ${snapshot.error}"));
                     }
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      final messages = snapshot.data!
-                          .where((m) => !_hiddenMessages.contains(m["id"]))
-                          .toList();
+                      final messages = snapshot.data!;
                       return Stack(
                         children: [
                           GroupedListView<Map<String, dynamic>, DateTime>(
@@ -102,7 +99,12 @@ class _ChatPageState extends State<ChatPage> {
                                   msg["senderID"] ==
                                   authService.value.currentUser!.uid,
                               onDeleteForMe: () {
-                                setState(() => _hiddenMessages.add(msg["id"]));
+                                firestoreService.value.addHiddenMessage(
+                                  receiverID: widget.receiverID,
+                                  receiverEmail: widget.receiverEmail,
+                                  docID: msg["docID"],
+                                );
+                                setState(() {});
                               },
                               onDeleteForAll: () {
                                 firestoreService.value.deleteMessage(
