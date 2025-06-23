@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: StreamBuilder(
-        stream: firestoreService.value.getUsersList(),
+        stream: firestoreService.value.getUsersListWithLastMessage(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -58,6 +58,11 @@ class HomePage extends StatelessWidget {
                     },
                     child: ListTile(
                       title: Text(user["email"]),
+                      subtitle: Text(
+                        user["lastMessage"],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       trailing: Icon(Icons.arrow_forward_ios),
                     ),
                   );
