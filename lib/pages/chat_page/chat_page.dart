@@ -128,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
                         ],
                       );
                     }
-                    return const Center(child: Text("No messages yet."));
+                    return const SizedBox.shrink();
                   },
                 ),
               ),
