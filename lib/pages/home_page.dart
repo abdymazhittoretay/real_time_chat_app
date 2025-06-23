@@ -70,6 +70,7 @@ class _HomePageState extends State<HomePage> {
                         user["lastMessage"],
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey),
                       ),
                       trailing: Text(
                         "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} ",
