@@ -12,16 +12,6 @@ class FirestoreService {
   final FirebaseFirestore _instance = FirebaseFirestore.instance;
   final FirebaseAuth _authInstance = FirebaseAuth.instance;
 
-  Stream<List<Map<String, dynamic>>> getUsersList() {
-    return _instance.collection("users").snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
-  }
-
   Future<void> sendMessage({
     required String receiverID,
     required String receiverEmail,
