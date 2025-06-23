@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: users.length,
               itemBuilder: (context, index) {
                 final Map<String, dynamic> user = users[index];
+                final DateTime date = user["lastMessageTimestamp"].toDate();
                 if (user["email"] != authService.value.currentUser!.email) {
                   return GestureDetector(
                     onTap: () {
@@ -70,7 +71,9 @@ class _HomePageState extends State<HomePage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      trailing: Icon(Icons.arrow_forward_ios),
+                      trailing: Text(
+                        "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} ",
+                      ),
                     ),
                   );
                 } else {
