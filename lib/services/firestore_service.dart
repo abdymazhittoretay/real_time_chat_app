@@ -69,49 +69,10 @@ class FirestoreService {
   }
 
   Stream<List<Map<String, dynamic>>> getUsersListWithLastMessage() {
-    final currentUser = _authInstance.currentUser!;
-    final currentUserID = currentUser.uid;
-
-    return _instance.collection("users").snapshots().asyncMap((snapshot) async {
-      List<Map<String, dynamic>> userList = [];
-
-      for (var doc in snapshot.docs) {
-        final userData = doc.data();
-        final userID = userData['uid'];
-
-        if (userID == currentUserID) continue;
-
-        final chatRoomID = [currentUserID, userID]..sort();
-        final chatRoomDocID = chatRoomID.join("_");
-
-        final lastMessageSnapshot = await _instance
-            .collection("chat_rooms")
-            .doc(chatRoomDocID)
-            .collection("messages")
-            .orderBy('timestamp', descending: true)
-            .limit(1)
-            .get();
-
-        if (lastMessageSnapshot.docs.isNotEmpty) {
-          final messageData = lastMessageSnapshot.docs.first.data();
-          userData['lastMessage'] = messageData['message'] ?? '';
-          userData['lastMessageTimestamp'] =
-              messageData['timestamp'] ?? Timestamp(0, 0);
-        } else {
-          userData['lastMessage'] = '';
-          userData['lastMessageTimestamp'] = Timestamp(0, 0);
-        }
-
-        userList.add(userData);
-      }
-
-      userList.sort((a, b) {
-        final timeA = a['lastMessageTimestamp'] as Timestamp;
-        final timeB = b['lastMessageTimestamp'] as Timestamp;
-        return timeB.compareTo(timeA);
-      });
-
-      return userList;
+    return _instance.collection("users").snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return doc.data();
+      }).toList();
     });
   }
 
